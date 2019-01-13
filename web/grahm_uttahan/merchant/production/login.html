@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- Meta, title, CSS, favicons, etc. -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="./images/favicon.ico" type="image/png" sizes="16x16">
+    <title>Gram-Utthanam</title>
+
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <!-- Bootstrap -->
+    <link href="../vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="../vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <!-- NProgress -->
+    <link href="../vendors/nprogress/nprogress.css" rel="stylesheet">
+    <!-- Animate.css -->
+    <link href="../vendors/animate.css/animate.min.css" rel="stylesheet">
+
+    <!-- Custom Theme Style -->
+    <link href="../build/css/custom.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.js"></script>
+    <script  src="https://code.jquery.com/jquery-3.3.1.js"  integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
+    <script>
+        var token = localStorage.getItem('Merchant')
+        if(token!=null){
+          window.location = "bidslist.html";
+        }
+    </script>
+    <style>
+      .rounded {
+         border-radius:.25rem!important
+       }
+       .img1{
+         width:200px;
+        }
+        .logo-container{
+          padding-top: 20px;
+        }
+    </style>
+  </head>
+
+  <body class="login" style="background-color:#FFFFFF">
+    <div class="logo-container text-center">
+      <img class="img1" src="./images/fullicon.png" alt="Gram-Utthanam"/>
+    </div>
+      <div class="login_wrapper">
+        <div class="animate form login_form" style="background-color:#ECEFF1">
+          <section class="card">
+            <form id = "send" method="post" accept-charset="utf-8" style="padding: 12px 12px; font-family:verdana;">
+              <h1 class="text-center">Login</h1>
+              <br>
+                <input name="contact_no" id="contact_no" type="number" class="form-control" placeholder="Phone Number" required="required"/>
+              <br>
+              <div>
+                <input name="password" id="password" type="password" class="form-control" placeholder="Password" required="required"/>
+              </div>
+              <br>
+                <input type="submit" class="btn btn-primary" value="Login">
+                  <label><a href="#">Forgot password?</a></label>
+              </div>
+             
+              </div>
+             
+            </form>
+          </section>
+         
+      </div>
+    </div>
+
+<script>
+  $(document).ready(function(){
+   $("#send").submit(function(e){
+      e.preventDefault();
+	  var phone_no = document.getElementById("contact_no").value;
+	  var password = document.getElementById("password").value;
+	 // alert(phone_no);
+	  //alert(password);
+	  var jsonData = {
+      contact_no:"",
+      password:""
+    }
+    jsonData.contact_no = phone_no;
+    jsonData.password = password;
+	//alert(jsonData);
+      axios.post('https://gramuthanam.herokuapp.com/merchant/login', jsonData, {   
+	     headers: {}
+      })
+      .then(function (response) {
+        console.log(response);
+        if(response.data.message == "Auth successful"){ 
+          
+          var data = response.data.token;
+          localStorage.setItem("Merchant", data);
+          location.href = "bidslist.html";
+        }
+        else{
+          alert(response.data.message);
+        }
+      })
+      .catch(error=>{
+        alert(error.message);
+      });
+      });
+  }); 
+  </script>
+
+
+  </body>
+</html>

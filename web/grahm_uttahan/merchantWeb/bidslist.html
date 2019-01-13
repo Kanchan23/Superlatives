@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <!-- Meta, title, CSS, favicons, etc. -->
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="icon" href="./images/favicon.ico" type="image/png" sizes="16x16">
+        <title>Gram-Utthanam</title>
+    
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.js"></script>
+        <style>
+        .img1{
+         width:200px;
+        }
+        .logo-container{
+          padding-top: 20px;
+        }
+        table{
+          background-color: #D3D3D3; 
+          width: 100%;
+        }
+        </style>
+        <script>
+          if(!localStorage.getItem('Merchant')){
+            window.location = "./login.html";
+          }  
+        </script> 
+      </head>
+    
+      <body class="nav-md" >
+              
+    
+                
+    
+        <!-- page content -->
+        <div class="right_col" role="main" style="min-height:768px">
+          <div class="">
+            <div class="page-title">
+              
+              <div class="title_right">
+               
+              </div>
+            </div>
+
+            <div class="clearfix"></div>
+
+            <div class="row">
+                <div class="x_panel">
+                  <div class="x_title">
+                    <h2>Available Bids</h2>
+                    <ul class="nav navbar-right panel_toolbox">
+                      <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                      </li>
+                    </ul>
+                    <div class="clearfix"></div>
+                  </div>
+                  <div class="x_content">
+                    <div class="table-responsive text-center">  
+                    <table id="datatable-fixed-header" class="table table-striped table-bordered" style="color:black">
+                      <thead>
+                        <tr class="headings">
+                          <th class="column-title text-center">Farmer Name</th>                        
+                          <th class="column-title text-center">Crop Category</th>
+               
+                         
+                          <th class="column-title text-center">Crop Type</th>
+                          <th class="column-title text-center">Quantity</th>
+                          <th class="column-title text-center">Price (per quintal)</th>
+                          <th class="column-title text-center">Total Price</th>
+                          
+                          
+                          <th class="column-title text-center">Accept</th>
+                        </tr>
+                      </thead>
+                      <tbody></tbody>
+                    </table>
+                   </div> 
+                  </div>
+                </div>
+              </div>          
+            </div>
+          </div>
+        </div>
+        <!-- /page content -->
+
+        <!-- footer content -->
+        <footer>
+          
+        </footer>
+        <!-- /footer content -->
+      </div>
+    </div>
+
+    
+
+    <script>
+      var token = localStorage.getItem('Merchant')
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+          if (this.readyState == 4 && this.status == 200) {
+            var i = 0;
+            var data = JSON.parse(this.responseText);
+			console.log(data);
+            var da = data.length;
+            while(i<data.length){
+              appendRow(data[i])
+              i++;
+            }
+          }
+      };
+
+     // xhttp.open("GET", "", true);
+	xhttp.open("GET", "https://gramuthanam.herokuapp.com/cropBid/unaccepted", true);
+      //xhttp.send();
+      // append row to the HTML table
+
+      function appendRow(product) {
+        var tbl = document.getElementById('datatable-fixed-header'); // table reference
+        var row = tbl.insertRow(tbl.rows.length),i; // append table row
+		console.log(row);
+        var arr = ['farmer_name', 'crop_category', 'child_crop_category', 'quantity', 'price', 'pickup_location', 'total', 'Accept']
+        for (i = 0; i < arr.length; i++) {
+            var abc = product[arr[i]];            
+            var cell= row.insertCell(i);
+            if(i==0){
+              cell.innerHTML = '<a href="product.html?id='+product._id+'"><b>'+abc+'</b></a>'
+            }
+            else if(i==1 ){            
+              var myImage = new Image();
+              myImage.src = product.rest_image;
+              cell.innerHTML = '<img src="'+product.rest_image+'" width="50" height="50" title="" alt="" />';
+             
+            }
+            else if(i==7){ 
+             createLink(cell, 'Accept', product._id, null);
+            } 
+            
+            else{
+             cell.innerHTML = product[arr[i]];
+            }
+        }
+    
+      }
+      
+      function createLink(cell, text, href, style) {
+          var link = document.createElement("a");
+          var button = document.createElement("input");
+          button.type = "button";
+          button.value = text;
+          if(text === 'Edit') {
+            link.setAttribute('href', `edit-restaurant.html?id=${href}`);
+            button.setAttribute('class', "btn btn-warning");  
+          } 
+          else {
+            link.setAttribute('href', `#`);
+            var deleteId = href;
+            link.setAttribute('onclick','deleteReq("'+deleteId+'");');
+            button.setAttribute('class', "btn btn-danger");  
+          }
+    
+          link.appendChild(button);
+          cell.appendChild(link); 
+      }
+      
+      function openChange(){
+         location = "change-password.html"
+       }
+
+    
+      function extractString(str){ 
+       return str[0]
+      }
+    
+      function getRestaurant(){
+         var data = $("#search").val();
+        axios.post('https://foodalaaddin-backend.herokuapp.com/restaurant/search',{ search : data} , {
+                headers: { Authorization: 'Bearer '+ token}
+           })
+             .then(function (response) {
+               $("#datatable-fixed-header").empty();
+               $("#datatable-fixed-header").append('<thead>'+
+                                                    '<tr class="headings">'+
+                                                      '<th class="column-title text-center">Restraunt Name</th>'+                       
+                                                      '<th class="column-title text-center">Restraunt Image</th>'+
+                                                      '<th class="column-title text-center">Short Description</th>'+
+                                                      '<th class="column-title text-center">Delivery Type</th>'+
+                                                      '<th class="column-title text-center">Address</th>'+
+                                                      '<th class="column-title text-center">Standard Timing</th>'+
+                                                      '<th class="column-title text-center">Minimum Order<br>(in &#8377)</th>'+
+                                                      '<th class="column-title text-center">Delivery Distance<br>(in km)</th>'+
+                                                      '<th class="column-title text-center">Delivery Time<br>(in min)</th>'+
+                                                      '<th class="column-title text-center">Edit</th>'+
+                                                      '<th class="column-title text-center">Delete</th>'+
+                                                    '</tr>'+
+                                                  '</thead>'+
+                                                  '<tbody></tbody>');
+               var i = 0;  
+               while(i<response.data.length){
+                appendRow(response.data[i]);
+                 i++;
+               }   
+             })
+             .catch(function (error) {
+                   alert(error.message);
+             });
+       }
+      
+      
+    </script>
+
+  </body>
+</html>
